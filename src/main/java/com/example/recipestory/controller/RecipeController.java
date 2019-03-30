@@ -1,0 +1,32 @@
+package com.example.recipestory.controller;
+
+import com.example.recipestory.datatransferobj.MultiRecipeResponse;
+import com.example.recipestory.service.RecipeService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+
+/**
+ * レシピの各リクエストを受付するクラス。
+ */
+@RestController
+@RequestMapping("/recipes")
+@RequiredArgsConstructor
+public class RecipeController {
+
+    final RecipeService recipeService;
+
+    /**
+     * 全レシピを取得する。
+     * 
+     * @return 全部のレシピが含めているレスポンス。
+     */
+    @GetMapping
+    public MultiRecipeResponse getRecipes() {
+        return new MultiRecipeResponse(recipeService.getAllRecipes());
+    }
+}
