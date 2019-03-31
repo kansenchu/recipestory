@@ -1,53 +1,50 @@
 package com.example.recipestory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import com.example.recipestory.datatransferobj.RecipeDto;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
-@Component
+
 public class TestObjectRepo {
+  private static Path basePath = Paths.get("src/test/resources");
 
-    @Value("${json.config.allRecipesJson}")
-    static File allRecipesJson;
+  private static Path allRecipesJson = basePath.resolve("allRecipes.json");
+  private static Path oneRecipeJson = basePath.resolve("oneRecipe.json");
 
-    // public enum TestObject {
-    // ALL_RECIPES(allRecipesJson, List.class, RecipeDto.class);
+  private static Path allRecipesResponse = basePath.resolve("allRecipesResponse.json");
+  private static Path oneRecipeResponse = basePath.resolve("oneRecipeResponse.json");
+  private static Path notFoundResponse = basePath.resolve("notFoundResponse.json");
 
-    // public Object data;
+  private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+  
+  public static List<RecipeDto> getAllRecipes() throws JsonParseException,
+                                        JsonMappingException, IOException {
+    return JSON_MAPPER.readValue(allRecipesJson.toFile(),
+                                new TypeReference<List<RecipeDto>>() {});
+  }
 
-    // private TestObject(String content, Class... objType) {
-    // ObjectMapper mapper = new ObjectMapper();
-    // try {
-    // data = mapper.readValue(content,
-    // mapper.getTypeFactory().constructCollectionType(objType[0], objType[1]));
-    // } catch (JsonParseException e) {
-    // e.printStackTrace();
-    // } catch (JsonMappingException e) {
-    // e.printStackTrace();
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    // }
+  public static RecipeDto getOneRecipe() throws JsonParseException,
+                                        JsonMappingException, IOException {
+    return JSON_MAPPER.readValue(oneRecipeJson.toFile(), RecipeDto.class);
+  }
 
-    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+  public static String getAllRecipesResponseAsString() throws IOException {
+    return new String(Files.readAllBytes(allRecipesResponse));
+  }
 
-    private static List<RecipeDto> allRecipes;
+  public static String getOneRecipeResponseAsString() throws IOException {
+    return new String(Files.readAllBytes(oneRecipeResponse));
+  }
 
-    public static List<RecipeDto> getAllRecipes() throws JsonParseException, JsonMappingException, IOException {
-        if (allRecipes == null) {
-            allRecipes = JSON_MAPPER.readValue(allRecipesJson, new TypeReference<List<RecipeDto>>() {
-            });
-        }
-        return allRecipes;
-    }
+  public static String getNotFoundResponseAsString() throws IOException {
+    return new String(Files.readAllBytes(notFoundResponse));
+  }
 }

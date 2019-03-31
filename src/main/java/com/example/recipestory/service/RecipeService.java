@@ -13,13 +13,16 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RecipeService {
-
   /**
    * 全部のレシピを探し出す.
    * @return レシピのリスト
    */
   public List<RecipeDto> getAllRecipes() {
     return Arrays.asList(new RecipeDto());
+  }
+
+  public RecipeDto getRecipe(int id) {
+    return new RecipeDto();
   }
 
 }

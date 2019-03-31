@@ -5,18 +5,17 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.recipestory.TestObjectRepo;
 import com.example.recipestory.controller.RecipeController;
 import com.example.recipestory.datatransferobj.RecipeDto;
+import com.example.recipestory.exception.RecipeNotFoundException;
 import com.example.recipestory.service.RecipeService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -40,13 +39,6 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = { "local.api.url.template=http://localhost:%d/recipes/%s" })
 public class RecipeControllerTests {
-
-  @Value("${json.config.allRecipesJson}")
-  File allRecipesJson;
-
-  @Value("${json.config.allRecipesResponse}")
-  File allRecipesResponse;
-
   @Spy
   RecipeService mockRecipeService;
 
@@ -65,24 +57,20 @@ public class RecipeControllerTests {
   MockMvc mockMvc;
   ObjectMapper jsonMapper = new ObjectMapper();
 
-  @Before
+  @BeforeClass
   public void setup() throws IOException {
     MockitoAnnotations.initMocks(this);
     mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
   }
 
-  /**
-   * 全件検索できること.
-   */
   @Test
   public void getAllRecords() throws Exception {
     // setup
-    List<RecipeDto> expectedRecipe = jsonMapper.readValue(allRecipesJson,
-          new TypeReference<List<RecipeDto>>() {});
+    List<RecipeDto> expectedRecipe = TestObjectRepo.getAllRecipes();
     when(mockRecipeService.getAllRecipes()).thenReturn(expectedRecipe);
 
     String requestUrl = String.format(urlTemplate, port, "");
-    String expected = new String(Files.readAllBytes(allRecipesResponse.toPath()));
+    String expected = TestObjectRepo.getAllRecipesResponseAsString();
 
     // act
     mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
@@ -91,5 +79,42 @@ public class RecipeControllerTests {
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(content().json(expected));
     verify(mockRecipeService).getAllRecipes();
+  }
+
+  @Test
+  public void getOneRecipe() throws Exception {
+    //setup
+    int recipeId = 1;
+    when(mockRecipeService.getRecipe(recipeId)).thenReturn(TestObjectRepo.getOneRecipe());
+    
+    String requestUrl = String.format(urlTemplate, port, recipeId);
+    String expected = TestObjectRepo.getOneRecipeResponseAsString();
+    
+    //act
+    mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+      //verify
+      .andExpect(status().isOk())
+      .andExpect(content().contentType("application/json;charset=UTF-8"))
+      .andExpect(content().json(expected));
+
+    verify(mockRecipeService).getRecipe(recipeId);
+  }
+
+  @Test
+  public void getNonexistentRecipe() throws Exception {
+    //setup
+    int recipeId = 999;
+    when(mockRecipeService.getRecipe(recipeId)).thenThrow(new RecipeNotFoundException());
+    
+    String requestUrl = String.format(urlTemplate, port, recipeId);
+    String expected = TestObjectRepo.getNotFoundResponseAsString();
+    
+    //act
+    mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+        //verify
+        .andExpect(status().is(404))
+        .andExpect(content().contentType("application/json;charset=UTF-8"))
+        .andExpect(content().json(expected));
+    verify(mockRecipeService).getRecipe(recipeId);
   }
 }

@@ -27,11 +27,11 @@ public class RecipeDao {
   @Id
   private int id;
 
-  /** レシピの名前.*/
+  /** レシピの名前. */
   @NotNull
   private String title;
 
-  /** レシピの作り時間.*/
+  /** レシピの作り時間. */
   @NotNull
   @Column(name = "making_time")
   private String makingTime;
