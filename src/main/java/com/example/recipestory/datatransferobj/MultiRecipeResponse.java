@@ -6,10 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * 全レシピ返す用POJOクラス
+ * 全レシピ返す用POJOクラス.
  */
 @Data
 @AllArgsConstructor
 public class MultiRecipeResponse {
-    List<RecipeDto> recipes;
+  List<RecipeDto> recipes;
 }

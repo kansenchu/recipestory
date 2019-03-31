@@ -1,7 +1,8 @@
 package com.example.recipestory.datatransferobj.views;
 
 /**
- * レシピのRESTやるとりするViewを指定するクラス。 実際に管理するロジックは、Jacksonのライブラリにあります。
+ * レシピのRESTやるとりするViewを指定するクラス。
+ * 実際に管理するロジックは、Jacksonのライブラリにあります。
  * Recipeクラスの中のAnnotationによってViewの項目が決める。
  * 
  * @see <a href=
@@ -10,9 +11,7 @@ package com.example.recipestory.datatransferobj.views;
  *
  */
 public class RecipeViews {
-    public static interface ExcludeId {
-    }
+  public static interface ExcludeId {}
 
-    public static interface IncludeId extends ExcludeId {
-    }
+  public static interface IncludeId extends ExcludeId {}
 }

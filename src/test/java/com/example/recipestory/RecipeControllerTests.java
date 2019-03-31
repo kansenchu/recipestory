@@ -5,22 +5,23 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
 import com.example.recipestory.controller.RecipeController;
 import com.example.recipestory.datatransferobj.RecipeDto;
 import com.example.recipestory.service.RecipeService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,56 +34,62 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 /**
- * RecipeControllerのエンドポイントが叩けられるかどうかのテスト
+ * RecipeControllerのエンドポイントが叩けられるかどうかのテスト.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = { "local.api.url.template=http://localhost:%d/recipes/%s" })
 public class RecipeControllerTests {
 
-	@InjectMocks
-	RecipeController recipeController;
+  @Value("${json.config.allRecipesJson}")
+  File allRecipesJson;
 
-	@Mock
-	RecipeService mockRecipeService;
+  @Value("${json.config.allRecipesResponse}")
+  File allRecipesResponse;
 
-	@Autowired
-	WebApplicationContext wac;
+  @Spy
+  RecipeService mockRecipeService;
 
-	@LocalServerPort
-	int port;
+  @InjectMocks
+  RecipeController recipeController;
 
-	@Value("${local.api.url.template}")
-	String urlTemplate;
+  @Autowired
+  WebApplicationContext wac;
 
-	MockMvc mockMvc;
-	ObjectMapper jsonMapper = new ObjectMapper();
+  @LocalServerPort
+  int port;
 
-	@Before
-	public void setup() throws IOException {
-		MockitoAnnotations.initMocks(this);
-		mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
-	}
+  @Value("${local.api.url.template}")
+  String urlTemplate;
 
-	/**
-	 * 全件検索できること
-	 */
-	@Test
-	public void getAllRecords() throws Exception {
-		// setup
-		List<RecipeDto> expectedRecipe = (List<RecipeDto>) TestObjectRepo.TestObject.ALL_RECIPES.data;
-		when(mockRecipeService.getAllRecipes()).thenReturn(expectedRecipe);
+  MockMvc mockMvc;
+  ObjectMapper jsonMapper = new ObjectMapper();
 
-		String requestUrl = String.format(urlTemplate, port, "");
-		String expected = new String(Files.readAllBytes(Paths.get("allRecipesResponse.json")));
+  @Before
+  public void setup() throws IOException {
+    MockitoAnnotations.initMocks(this);
+    mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
+  }
 
-		// act
-		mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+  /**
+   * 全件検索できること.
+   */
+  @Test
+  public void getAllRecords() throws Exception {
+    // setup
+    List<RecipeDto> expectedRecipe = jsonMapper.readValue(allRecipesJson,
+          new TypeReference<List<RecipeDto>>() {});
+    when(mockRecipeService.getAllRecipes()).thenReturn(expectedRecipe);
 
-				// verify
-				.andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(content().json(expected));
-		verify(mockRecipeService).getAllRecipes();
-	}
+    String requestUrl = String.format(urlTemplate, port, "");
+    String expected = new String(Files.readAllBytes(allRecipesResponse.toPath()));
 
+    // act
+    mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+        // verify
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("application/json;charset=UTF-8"))
+        .andExpect(content().json(expected));
+    verify(mockRecipeService).getAllRecipes();
+  }
 }
