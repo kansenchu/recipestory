@@ -116,7 +116,7 @@ public class RecipeServiceTests {
   public void editRecipe_nonexistent() throws Exception {
     //setup
     expectedEx.expect(InvalidRecipeException.class);
-    expectedEx.expectMessage(ErrorResponse.Message.NOT_FOUND.getMessage());
+    expectedEx.expectMessage(ErrorResponse.Message.NotFound.getMessage());
 
     RecipeDto newRecipe =  TestObjectRepo.getAdditionalRecipe();
     int testRecipeId = -1;

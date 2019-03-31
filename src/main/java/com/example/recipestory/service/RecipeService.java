@@ -97,7 +97,7 @@ public class RecipeService {
         oldRecipe.setCost(Integer.parseInt(recipeDto.getCost()));
       }
       return mapToRecipe(repository.save(oldRecipe));
-    }).orElseThrow(() -> new InvalidRecipeException(ErrorResponse.Message.NOT_FOUND.getMessage()));
+    }).orElseThrow(() -> new InvalidRecipeException(ErrorResponse.Message.NotFound.getMessage()));
   }
 
   /**

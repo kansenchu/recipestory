@@ -16,7 +16,8 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class ErrorResponse {
   public enum Message {
-    NOT_FOUND("No Recipe found");
+    NotFound("No Recipe found"),
+    CreationFailed("Recipe creation failed!");
 
     private String message;
     
@@ -35,7 +36,6 @@ public class ErrorResponse {
   final Message message;
 
   /** 欠けてるパラメータのString. */
-  // @JsonView(ResponseViews.MessageWithRequired.class)
   String required;
 
 }
