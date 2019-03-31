@@ -39,7 +39,7 @@ public class RecipeService {
    * @throws RecipeNotFoundException レシピ見つかれない時
    */
   public RecipeDto getRecipe(int id) throws RecipeNotFoundException {
-    return mapToRecipe(repository.findById(id).orElseThrow(RecipeNotFoundException::new));
+    return mapToRecipeDto(repository.findById(id).orElseThrow(RecipeNotFoundException::new));
   }
 
   /**
@@ -50,7 +50,7 @@ public class RecipeService {
     return repository.findAll(Sort.by("id").ascending())
         .parallelStream()
         .peek(System.out::println)
-        .map(this::mapToRecipe)
+        .map(this::mapToRecipeDto)
         .collect(Collectors.toList());
   }
 
@@ -65,7 +65,7 @@ public class RecipeService {
       RecipeDao toSave = mapToRecipeDao(recipeDto);
       System.out.println(toSave);
       RecipeDao recipeDao = repository.save(mapToRecipeDao(recipeDto));
-      return mapToRecipe(repository.findById(recipeDao.getId())
+      return mapToRecipeDto(repository.findById(recipeDao.getId())
           .orElseThrow(RecipeNotFoundException::new));
     } catch (ConstraintViolationException ex) {
       throw new InvalidRecipeException();
@@ -96,7 +96,7 @@ public class RecipeService {
       if (recipeDto.getCost() != null) {
         oldRecipe.setCost(Integer.parseInt(recipeDto.getCost()));
       }
-      return mapToRecipe(repository.save(oldRecipe));
+      return mapToRecipeDto(repository.save(oldRecipe));
     }).orElseThrow(() -> new InvalidRecipeException(ErrorResponse.Message.NotFound.getMessage()));
   }
 
@@ -110,7 +110,7 @@ public class RecipeService {
     return repository.findById(id)
         .map((Function<RecipeDao, RecipeDto>) recipe -> {
           repository.delete(recipe);
-          return mapToRecipe(recipe);
+          return mapToRecipeDto(recipe);
         }).orElseThrow(RecipeNotFoundException::new);
   }
 
@@ -119,7 +119,7 @@ public class RecipeService {
    * @param recipeDao 変換したいDAO
    * @return 平等のAPIモデルオブジェクト
    */
-  private RecipeDto mapToRecipe(RecipeDao recipeDao) {
+  private RecipeDto mapToRecipeDto(RecipeDao recipeDao) {
     return mapper.map(recipeDao, RecipeDto.class);
   }
 

@@ -131,6 +131,7 @@ public class RecipeControllerTests {
     RecipeDto recipe = TestObjectRepo.getAdditionalRecipe();
     String parameter = jsonMapper.writeValueAsString(recipe);
     String expected = TestObjectRepo.getCreationSuccessResponseAsString();
+    when(mockRecipeService.addRecipe(recipe)).thenReturn(recipe);
     
     //act
     MvcResult res = mockMvc.perform(MockMvcRequestBuilders.post(requestUrl)
@@ -151,8 +152,8 @@ public class RecipeControllerTests {
     String requestUrl = String.format(urlTemplate, port, 1);
     RecipeDto recipe = TestObjectRepo.getAdditionalRecipe();
     String parameter = jsonMapper.writeValueAsString(recipe);
-    System.out.println(parameter);
     String expected = TestObjectRepo.getUpdateSuccessResponseAsString();
+    when(mockRecipeService.editRecipe(1, recipe)).thenReturn(recipe);
     
     //act
     mockMvc.perform(MockMvcRequestBuilders.patch(requestUrl)
@@ -163,7 +164,7 @@ public class RecipeControllerTests {
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
         .andExpect(content().json(expected));
-    verify(mockRecipeService).addRecipe(recipe);
+    verify(mockRecipeService).editRecipe(1, recipe);
   }
 
   @Test
@@ -173,8 +174,8 @@ public class RecipeControllerTests {
     String requestUrl = String.format(urlTemplate, port, recipeId);
     RecipeDto recipe = TestObjectRepo.getAdditionalRecipe();
     String parameter = jsonMapper.writeValueAsString(recipe);
-    System.out.println(parameter);
     String expected = TestObjectRepo.getNotFoundResponseAsString();
+    when(mockRecipeService.editRecipe(999, recipe)).thenThrow(new RecipeNotFoundException());
     
     //act
     mockMvc.perform(MockMvcRequestBuilders.patch(requestUrl)
