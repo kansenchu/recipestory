@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.recipestory.TestObjectRepo;
-import com.example.recipestory.controller.RecipeController;
+import com.example.recipestory.controller.BasicRecipeController;
 import com.example.recipestory.datatransferobj.RecipeDto;
 import com.example.recipestory.exception.RecipeNotFoundException;
 import com.example.recipestory.service.RecipeService;
@@ -22,18 +22,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -44,13 +40,13 @@ import org.springframework.web.context.WebApplicationContext;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = { "local.api.url.template=http://localhost:%d/recipes/%s" })
-public class RecipeControllerTests {
+public class BasicRecipeControllerTests {
 
   @Mock
   RecipeService mockRecipeService;
 
   @InjectMocks
-  RecipeController recipeController;
+  BasicRecipeController recipeController;
 
   @Autowired
   WebApplicationContext wac;
@@ -134,14 +130,14 @@ public class RecipeControllerTests {
     when(mockRecipeService.addRecipe(recipe)).thenReturn(recipe);
     
     //act
-    MvcResult res = mockMvc.perform(MockMvcRequestBuilders.post(requestUrl)
+    mockMvc.perform(MockMvcRequestBuilders.post(requestUrl)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(parameter))
     
         //verify
         .andExpect(status().isOk())
         .andExpect(content().contentType("application/json;charset=UTF-8"))
-        //.andExpect(content().json(expected))
+        .andExpect(content().json(expected))
         .andReturn();
     verify(mockRecipeService).addRecipe(recipe);
   }

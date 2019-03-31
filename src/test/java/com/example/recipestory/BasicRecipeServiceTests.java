@@ -6,7 +6,7 @@ import com.example.recipestory.datatransferobj.ErrorResponse;
 import com.example.recipestory.datatransferobj.RecipeDto;
 import com.example.recipestory.exception.InvalidRecipeException;
 import com.example.recipestory.exception.RecipeNotFoundException;
-import com.example.recipestory.service.RecipeService;
+import com.example.recipestory.service.BasicRecipeService;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,12 +27,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-public class RecipeServiceTests {
+public class BasicRecipeServiceTests {
   @Rule
   public ExpectedException expectedEx = ExpectedException.none();
 
   @Autowired
-  RecipeService recipeService;
+  BasicRecipeService recipeService;
 
   ObjectMapper jsonMapper = new ObjectMapper();
 
