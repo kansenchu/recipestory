@@ -1,2 +1,7 @@
 # recipestory
 The story of recipes
+
+このプロジェクトはDependency Injectionを使用する。
+Dependency Injectionというのは、クラスが必要なものをインターフェースとして定義して、runtimeだけに本物のクラスを入れる。
+それによって、柔軟な構造ができます。
+今回のプロジェクトは、RequiredArgsConstructorとSpringのデフォルト動きによって、Constructor-based Injectionをしています。
