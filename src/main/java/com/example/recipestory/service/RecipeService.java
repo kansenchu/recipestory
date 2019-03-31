@@ -1,6 +1,7 @@
 package com.example.recipestory.service;
 
 import com.example.recipestory.dataaccessobj.RecipeDao;
+import com.example.recipestory.datatransferobj.ErrorResponse;
 import com.example.recipestory.datatransferobj.RecipeDto;
 import com.example.recipestory.exception.InvalidRecipeException;
 import com.example.recipestory.exception.RecipeNotFoundException;
@@ -96,7 +97,7 @@ public class RecipeService {
         oldRecipe.setCost(Integer.parseInt(recipeDto.getCost()));
       }
       return mapToRecipe(repository.save(oldRecipe));
-    }).orElseThrow(InvalidRecipeException::new);
+    }).orElseThrow(() -> new InvalidRecipeException(ErrorResponse.Message.NOT_FOUND.getMessage()));
   }
 
   /**
